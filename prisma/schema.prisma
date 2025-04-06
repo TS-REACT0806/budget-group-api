@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-kysely"
+  output   = "../src/db"
+  fileName = "types.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+enum UserRoleType {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+model users {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at DateTime     @default(now()) @db.Timestamptz(6)
+  deleted_at DateTime?    @db.Timestamptz(6)
+  first_name String?
+  last_name  String?
+  mobile_no  String?
+  email      String       @unique
+  role       UserRoleType @default(USER)
+
+  // Relations
+  groups         groups[]
+  group_members  group_members[]
+  group_expenses group_expenses[]
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([first_name])
+  @@index([last_name])
+  @@index([email])
+  @@index([mobile_no])
+}
+
+model accounts {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at DateTime  @default(now()) @db.Timestamptz(6)
+  deleted_at DateTime? @db.Timestamptz(6)
+  email      String    @unique
+  password   String
+
+  // Relations
+  sessions sessions[]
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([email])
+}
+
+model sessions {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  deleted_at    DateTime? @db.Timestamptz(6)
+  refresh_token String    @unique @db.Text
+
+  // Foreign Keys
+  account_id String @db.Uuid
+
+  // Relations
+  account accounts @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([account_id])
+}
+
+model feature_flags {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at DateTime     @default(now()) @db.Timestamptz(6)
+  deleted_at DateTime?    @db.Timestamptz(6)
+  role       UserRoleType
+  json       Json
+
+  // Unique constraints
+  @@unique([role])
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([role])
+}
+
+enum SplitType {
+  EQUAL
+  PERCENTAGE
+  EXACT
+}
+
+model groups {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime? @db.Timestamptz(6)
+  name        String
+  description String?
+  split_type  SplitType @default(EQUAL)
+
+  // Foreign Keys
+  owner_id String @db.Uuid
+
+  // Relations
+  owner          users            @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  group_members  group_members[]
+  group_expenses group_expenses[]
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([owner_id])
+}
+
+model group_members {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+  deleted_at       DateTime? @db.Timestamptz(6)
+  percentage_share Float?
+  exact_share      Decimal?  @db.Decimal(10, 2)
+
+  // Foreign Keys
+  group_id String @db.Uuid
+  user_id  String @db.Uuid
+
+  // Relations
+  group groups @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  user  users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([group_id])
+  @@index([user_id])
+}
+
+model group_expenses {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  deleted_at   DateTime? @db.Timestamptz(6)
+  amount       Decimal   @db.Decimal(10, 2)
+  expense_date DateTime? @db.Timestamptz(6)
+  description  String?
+
+  // Foreign Keys
+  group_id String @db.Uuid
+  owner_id String @db.Uuid
+
+  // Relations
+  group groups @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  owner users  @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([created_at])
+  @@index([updated_at])
+  @@index([deleted_at])
+  @@index([owner_id])
+  @@index([group_id])
+  @@index([expense_date])
+}

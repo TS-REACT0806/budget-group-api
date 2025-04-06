@@ -1,0 +1,98 @@
+{
+  "name": "budget-group-api",
+  "version": "0.0.1",
+  "repository": "https://github.com/constrod/budget-group-api",
+  "bugs": {
+    "url": "https://github.com/constrod/budget-group-api/issues"
+  },
+  "contributors": [
+    {
+      "name": "Rodrick Alcantara",
+      "url": "https://github.com/constROD"
+    },
+    {
+      "name": "Mark Gabrielle Recoco Cay",
+      "url": "https://github.com/MarkCay"
+    }
+  ],
+  "description": "Budget Group API",
+  "author": "Rodrick Alcantara <rialcantara21@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch ./src/app.ts",
+    "clean": "rm -rf ./dist",
+    "build": "tsup",
+    "start": "node ./dist/app.js",
+    "db:start": "docker compose -f ./docker-compose-db.yaml up -d",
+    "db:stop": "docker compose -f ./docker-compose-db.yaml down",
+    "db:migrate": "tsx ./cli/db-migrate.ts",
+    "db:create": "prisma migrate dev --create-only",
+    "db:generate": "prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "pnpm lint --fix",
+    "format": "prettier --write '**/*.ts{,x}'",
+    "check:types": "tsc --noEmit",
+    "check:spell": "git diff --name-only | cspell --no-summary --no-progress --no-must-find-files --file-list stdin",
+    "check:all": "concurrently \"pnpm lint\" \"pnpm check:types\" \"pnpm check:spell\"",
+    "pre-commit": "concurrently \"lint-staged --allow-empty\" \"pnpm check:types\" \"pnpm check:spell\""
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.5",
+    "@hono/swagger-ui": "^0.4.1",
+    "@hono/zod-openapi": "^0.16.4",
+    "@scalar/hono-api-reference": "^0.5.159",
+    "bcrypt": "^5.1.1",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "hono": "^4.6.9",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "kysely": "^0.27.4",
+    "pg": "^8.13.1",
+    "pino": "^9.5.0",
+    "pino-pretty": "^12.1.0",
+    "prisma-kysely": "^1.8.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@faker-js/faker": "^9.2.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^20.17.6",
+    "@types/pg": "^8.11.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
+    "@vitest/coverage-v8": "^2.1.4",
+    "chalk": "^5.3.0",
+    "concurrently": "^9.1.0",
+    "cspell": "^8.16.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "swagger-jsdoc": "^6.2.8",
+    "tsc-alias": "^1.8.10",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite-tsconfig-paths": "^5.1.1",
+    "vitest": "^2.1.4"
+  },
+  "packageManager": "pnpm@9.1.1"
+}
