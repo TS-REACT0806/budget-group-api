@@ -22,9 +22,6 @@ export const userSchemaObject = {
   last_name: z.string().nullable().openapi({
     example: 'ROD',
   }),
-  mobile_no: z.string().nullable().openapi({
-    example: '+1234567890',
-  }),
   role: z.nativeEnum(UserRoleType).openapi({
     example: UserRoleType.USER,
   }),
@@ -34,10 +31,7 @@ export const userSchema = z.object(userSchemaObject) satisfies z.ZodType<User>;
 export const userSchemaOpenApi = userSchema.openapi('User');
 export const userSchemaFields = z.enum(Object.keys(userSchemaObject) as [string, ...string[]]);
 
-export type CreateUser = Omit<
-  User,
-  'id' | 'created_at' | 'updated_at' | 'deleted_at' | 'mobile_no'
-> & {
+export type CreateUser = Omit<User, 'id' | 'created_at' | 'updated_at' | 'deleted_at'> & {
   id?: string;
 };
 export type UpdateUser = Partial<User>;
