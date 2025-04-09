@@ -3,23 +3,17 @@ import { faker } from '@faker-js/faker';
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
 import { createTestGroupsInDB, makeFakeGroup } from '../groups/__test-utils__/make-fake-group';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import {
   createTestGroupMembersInDB,
   makeFakeGroupMember,
 } from './__test-utils__/make-fake-group-member';
 import { getGroupMemberData } from './get-group-member';
 
-const fakeUser = makeFakeUser();
-const fakeGroup = makeFakeGroup({ owner_id: fakeUser.id });
-const fakeGroupMember = makeFakeGroupMember({
-  user_id: fakeUser.id,
-  group_id: fakeGroup.id,
-});
+const fakeGroup = makeFakeGroup();
+const fakeGroupMember = makeFakeGroupMember({ group_id: fakeGroup.id });
 
 describe('Get Group Member', () => {
   testWithDbClient('should get a group member by ID', async ({ dbClient }) => {
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({ dbClient, values: fakeGroup });
     await createTestGroupMembersInDB({ dbClient, values: fakeGroupMember });
 

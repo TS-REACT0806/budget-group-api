@@ -11,8 +11,9 @@ export function makeFakeGroupExpense(override: Partial<GroupExpense> = {}): Grou
     amount: faker.finance.amount({ min: 10, max: 1000, dec: 2 }),
     expense_date: faker.date.recent(),
     description: faker.lorem.sentence(),
+    tag: faker.lorem.word(),
     group_id: faker.string.uuid(),
-    owner_id: faker.string.uuid(),
+    member_id: faker.string.uuid(),
     ...override,
   };
 }

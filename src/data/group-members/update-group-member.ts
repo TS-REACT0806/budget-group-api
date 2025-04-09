@@ -7,15 +7,28 @@ export type UpdateGroupMemberDataArgs = {
   dbClient: DbClient;
   id: string;
   values: UpdateGroupMember;
+  groupId?: string;
 };
 
-export async function updateGroupMemberData({ dbClient, id, values }: UpdateGroupMemberDataArgs) {
-  const updatedRecord = await dbClient
+export async function updateGroupMemberData({
+  dbClient,
+  id,
+  values,
+  groupId,
+}: UpdateGroupMemberDataArgs) {
+  let baseQuery = dbClient
     .updateTable('group_members')
     .set({ ...values, updated_at: sql`NOW()` })
     .where('id', '=', id)
-    .returningAll()
-    .executeTakeFirstOrThrow(() => new NotFoundError('Group member not found.'));
+    .returningAll();
+
+  if (groupId) {
+    baseQuery = baseQuery.where('group_id', '=', groupId);
+  }
+
+  const updatedRecord = await baseQuery.executeTakeFirstOrThrow(
+    () => new NotFoundError('Group member not found.')
+  );
 
   return updatedRecord;
 }

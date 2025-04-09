@@ -11,6 +11,7 @@ export const createUserSchema = {
     role: true,
     first_name: true,
     last_name: true,
+    mobile_no: true,
   }),
   response: userSchemaOpenApi,
 };

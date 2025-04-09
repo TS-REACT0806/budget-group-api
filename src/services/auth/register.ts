@@ -21,6 +21,7 @@ export type RegisterAuthServiceArgs = {
     firstName?: string;
     lastName?: string;
     role?: UserRoleType;
+    mobileNo?: string;
   };
   dependencies?: RegisterAuthServiceDependencies;
 };
@@ -63,6 +64,7 @@ export async function registerAuthService({
         first_name: payload.firstName ?? null,
         last_name: payload.lastName ?? null,
         role: payload.role ?? UserRoleType.USER,
+        mobile_no: payload.mobileNo ?? null,
       },
     });
   });

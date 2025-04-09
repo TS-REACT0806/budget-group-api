@@ -1,4 +1,5 @@
 import { type GroupExpense } from '@/db/schema';
+import { decimalNumberSchema } from '@/utils/zod-schemas';
 import { z } from '@hono/zod-openapi';
 
 export const groupExpenseSchemaObject = {
@@ -12,19 +13,22 @@ export const groupExpenseSchemaObject = {
   deleted_at: z.union([z.coerce.date(), z.string()]).nullable().openapi({
     example: null,
   }),
-  amount: z.string().openapi({
+  amount: decimalNumberSchema.openapi({
     example: '150.75',
   }),
-  expense_date: z.union([z.coerce.date(), z.string(), z.null()]).nullable().openapi({
+  expense_date: z.union([z.coerce.date(), z.string()]).nullable().openapi({
     example: new Date().toISOString(),
   }),
   description: z.string().nullable().openapi({
     example: 'Dinner at restaurant',
   }),
+  tag: z.string().nullable().openapi({
+    example: 'dinner',
+  }),
   group_id: z.string().uuid().openapi({
     example: '123e4567-e89b-12d3-a456-426614174001',
   }),
-  owner_id: z.string().uuid().openapi({
+  member_id: z.string().uuid().openapi({
     example: '123e4567-e89b-12d3-a456-426614174002',
   }),
 };
@@ -40,7 +44,5 @@ export const groupExpenseSchemaFields = z.enum(
 export type CreateGroupExpense = Omit<
   GroupExpense,
   'id' | 'created_at' | 'updated_at' | 'deleted_at'
-> & {
-  id?: string;
-};
+>;
 export type UpdateGroupExpense = Partial<GroupExpense>;

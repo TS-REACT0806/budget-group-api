@@ -3,9 +3,10 @@ import { type GroupExpense } from '@/db/schema';
 import { makeDefaultDataListReturn } from '../make-default-list-return';
 
 export type SearchGroupExpensesFilters = {
-  groupId?: string;
-  ownerId?: string;
   searchText?: string;
+  tag?: string;
+  groupId?: string;
+  memberId?: string;
   startDate?: Date;
   endDate?: Date;
 };
@@ -35,12 +36,16 @@ export async function searchGroupExpensesData({
     baseQuery = baseQuery.where('deleted_at', 'is', null);
   }
 
+  if (filters?.tag) {
+    baseQuery = baseQuery.where('tag', '=', filters.tag);
+  }
+
   if (filters?.groupId) {
     baseQuery = baseQuery.where('group_id', '=', filters.groupId);
   }
 
-  if (filters?.ownerId) {
-    baseQuery = baseQuery.where('owner_id', '=', filters.ownerId);
+  if (filters?.memberId) {
+    baseQuery = baseQuery.where('member_id', '=', filters.memberId);
   }
 
   if (filters?.searchText) {

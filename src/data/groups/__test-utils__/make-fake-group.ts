@@ -1,19 +1,35 @@
 import { type DbClient } from '@/db/create-db-client';
 import { type Group } from '@/db/schema';
-import { SplitType } from '@/db/types';
-import { overrideValueOrUseDefault } from '@/utils/guard';
+import { GroupSplitType } from '@/db/types';
 import { faker } from '@faker-js/faker';
+import { type SettlementSummary } from '../schema/settlement-summary';
 
-export function makeFakeGroup(args?: Partial<Group>) {
+export function makeFakeSettlementSummary(
+  override: Partial<SettlementSummary> = {}
+): SettlementSummary {
   return {
-    id: overrideValueOrUseDefault(args?.id, faker.string.uuid()),
-    created_at: overrideValueOrUseDefault(args?.created_at, faker.date.recent()),
-    updated_at: overrideValueOrUseDefault(args?.updated_at, faker.date.recent()),
-    deleted_at: overrideValueOrUseDefault(args?.deleted_at, null),
-    name: overrideValueOrUseDefault(args?.name, faker.lorem.word()),
-    description: overrideValueOrUseDefault(args?.description, faker.lorem.sentence()),
-    split_type: overrideValueOrUseDefault(args?.split_type, SplitType.EQUAL),
-    owner_id: overrideValueOrUseDefault(args?.owner_id, faker.string.uuid()),
+    last_calculated_at: faker.date.recent(),
+    total: {
+      expenses: faker.finance.amount(),
+      payments: faker.finance.amount(),
+    },
+    members: {},
+    ...override,
+  };
+}
+
+export function makeFakeGroup(override: Partial<Group> = {}): Group {
+  return {
+    id: faker.string.uuid(),
+    created_at: faker.date.recent(),
+    updated_at: faker.date.recent(),
+    deleted_at: null,
+    name: faker.lorem.word(),
+    description: faker.lorem.sentence(),
+    tag: faker.lorem.word(),
+    split_type: GroupSplitType.EQUAL,
+    settlement_summary: null,
+    ...override,
   } satisfies Group;
 }
 

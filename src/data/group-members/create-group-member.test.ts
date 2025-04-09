@@ -1,22 +1,19 @@
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
 import { createTestGroupsInDB, makeFakeGroup } from '../groups/__test-utils__/make-fake-group';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import { makeFakeGroupMember } from './__test-utils__/make-fake-group-member';
 import { createGroupMemberData } from './create-group-member';
 
-const fakeUser = makeFakeUser();
-const fakeGroup = makeFakeGroup({ owner_id: fakeUser.id });
+const fakeGroup = makeFakeGroup();
 
 describe('Create Group Member', () => {
   testWithDbClient('should create a group member', async ({ dbClient }) => {
     const fakeGroupMember = makeFakeGroupMember({
-      user_id: fakeUser.id,
       group_id: fakeGroup.id,
     });
 
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({ dbClient, values: fakeGroup });
+
     const createdGroupMember = await createGroupMemberData({ dbClient, values: fakeGroupMember });
 
     expect(createdGroupMember).toBeDefined();

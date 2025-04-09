@@ -2,25 +2,28 @@ import { NotFoundError } from '@/utils/errors';
 import { faker } from '@faker-js/faker';
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
+import {
+  createTestGroupMembersInDB,
+  makeFakeGroupMember,
+} from '../group-members/__test-utils__/make-fake-group-member';
 import { createTestGroupsInDB, makeFakeGroup } from '../groups/__test-utils__/make-fake-group';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import {
   createTestGroupExpensesInDB,
   makeFakeGroupExpense,
 } from './__test-utils__/make-fake-group-expense';
 import { deleteGroupExpenseData } from './delete-group-expense';
 
-const fakeUser = makeFakeUser();
-const fakeGroup = makeFakeGroup({ owner_id: fakeUser.id });
+const fakeGroup = makeFakeGroup();
+const fakeGroupMember = makeFakeGroupMember({ group_id: fakeGroup.id });
 const fakeGroupExpense = makeFakeGroupExpense({
-  owner_id: fakeUser.id,
+  member_id: fakeGroupMember.id,
   group_id: fakeGroup.id,
 });
 
 describe('Delete Group Expense', () => {
   testWithDbClient('should delete a group expense by ID', async ({ dbClient }) => {
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({ dbClient, values: fakeGroup });
+    await createTestGroupMembersInDB({ dbClient, values: fakeGroupMember });
     await createTestGroupExpensesInDB({ dbClient, values: fakeGroupExpense });
 
     const initialGroupExpenses = await dbClient.selectFrom('group_expenses').selectAll().execute();

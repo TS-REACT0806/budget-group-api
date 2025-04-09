@@ -8,20 +8,19 @@ import {
 } from './__test-utils__/make-fake-group-member';
 import { searchGroupMembersData } from './search-group-members';
 
+const fakeUser1 = makeFakeUser();
+const fakeUser2 = makeFakeUser();
+const fakeGroup = makeFakeGroup();
+
 describe('Search Group Members', () => {
   testWithDbClient('should search group members with pagination', async ({ dbClient }) => {
-    const user1 = makeFakeUser();
-    const user2 = makeFakeUser();
-    const group1 = makeFakeGroup({ owner_id: user1.id });
-    const group2 = makeFakeGroup({ owner_id: user2.id });
-
-    await createTestUsersInDB({ dbClient, values: [user1, user2] });
-    await createTestGroupsInDB({ dbClient, values: [group1, group2] });
+    await createTestGroupsInDB({ dbClient, values: fakeGroup });
+    await createTestUsersInDB({ dbClient, values: [fakeUser1, fakeUser2] });
 
     const groupMembers = [
-      makeFakeGroupMember({ user_id: user1.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user2.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user1.id, group_id: group2.id }),
+      makeFakeGroupMember({ user_id: fakeUser1.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: fakeUser2.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: fakeUser1.id, group_id: fakeGroup.id }),
     ];
 
     await createTestGroupMembersInDB({ dbClient, values: groupMembers });
@@ -38,45 +37,38 @@ describe('Search Group Members', () => {
   });
 
   testWithDbClient('should filter group members by groupId', async ({ dbClient }) => {
-    const user1 = makeFakeUser();
-    const user2 = makeFakeUser();
-    const group1 = makeFakeGroup({ owner_id: user1.id });
-    const group2 = makeFakeGroup({ owner_id: user2.id });
-
-    await createTestUsersInDB({ dbClient, values: [user1, user2] });
-    await createTestGroupsInDB({ dbClient, values: [group1, group2] });
+    await createTestGroupsInDB({ dbClient, values: fakeGroup });
+    await createTestUsersInDB({ dbClient, values: [fakeUser1, fakeUser2] });
 
     const groupMembers = [
-      makeFakeGroupMember({ user_id: user1.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user2.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user1.id, group_id: group2.id }),
+      makeFakeGroupMember({ user_id: fakeUser1.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: fakeUser2.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: fakeUser1.id, group_id: fakeGroup.id }),
     ];
 
     await createTestGroupMembersInDB({ dbClient, values: groupMembers });
 
     const result = await searchGroupMembersData({
       dbClient,
-      filters: { groupId: group1.id },
+      filters: { groupId: fakeGroup.id },
     });
 
-    expect(result.records).toHaveLength(2);
-    expect(result.total_records).toBe(2);
-    expect(result.records.every(member => member.group_id === group1.id)).toBe(true);
+    expect(result.records).toHaveLength(3);
+    expect(result.total_records).toBe(3);
+    expect(result.records.every(member => member.group_id === fakeGroup.id)).toBe(true);
   });
 
   testWithDbClient('should filter group members by userId', async ({ dbClient }) => {
     const user1 = makeFakeUser();
     const user2 = makeFakeUser();
-    const group1 = makeFakeGroup({ owner_id: user1.id });
-    const group2 = makeFakeGroup({ owner_id: user2.id });
 
+    await createTestGroupsInDB({ dbClient, values: fakeGroup });
     await createTestUsersInDB({ dbClient, values: [user1, user2] });
-    await createTestGroupsInDB({ dbClient, values: [group1, group2] });
 
     const groupMembers = [
-      makeFakeGroupMember({ user_id: user1.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user2.id, group_id: group1.id }),
-      makeFakeGroupMember({ user_id: user1.id, group_id: group2.id }),
+      makeFakeGroupMember({ user_id: user1.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: user2.id, group_id: fakeGroup.id }),
+      makeFakeGroupMember({ user_id: user1.id, group_id: fakeGroup.id }),
     ];
 
     await createTestGroupMembersInDB({ dbClient, values: groupMembers });
@@ -93,19 +85,18 @@ describe('Search Group Members', () => {
 
   testWithDbClient('should exclude archived group members by default', async ({ dbClient }) => {
     const user = makeFakeUser();
-    const group = makeFakeGroup({ owner_id: user.id });
-
     await createTestUsersInDB({ dbClient, values: user });
-    await createTestGroupsInDB({ dbClient, values: group });
+
+    await createTestGroupsInDB({ dbClient, values: fakeGroup });
 
     const activeGroupMember = makeFakeGroupMember({
       user_id: user.id,
-      group_id: group.id,
+      group_id: fakeGroup.id,
     });
 
     const archivedGroupMember = makeFakeGroupMember({
       user_id: user.id,
-      group_id: group.id,
+      group_id: fakeGroup.id,
       deleted_at: new Date(),
     });
 
@@ -125,19 +116,18 @@ describe('Search Group Members', () => {
     'should include archived group members when includeArchived is true',
     async ({ dbClient }) => {
       const user = makeFakeUser();
-      const group = makeFakeGroup({ owner_id: user.id });
-
       await createTestUsersInDB({ dbClient, values: user });
-      await createTestGroupsInDB({ dbClient, values: group });
+
+      await createTestGroupsInDB({ dbClient, values: fakeGroup });
 
       const activeGroupMember = makeFakeGroupMember({
         user_id: user.id,
-        group_id: group.id,
+        group_id: fakeGroup.id,
       });
 
       const archivedGroupMember = makeFakeGroupMember({
         user_id: user.id,
-        group_id: group.id,
+        group_id: fakeGroup.id,
         deleted_at: new Date(),
       });
 

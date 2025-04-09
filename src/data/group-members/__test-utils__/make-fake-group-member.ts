@@ -1,5 +1,6 @@
 import { type DbClient } from '@/db/create-db-client';
 import { type GroupMember } from '@/db/schema';
+import { GroupMemberRole, GroupMemberStatus } from '@/db/types';
 import { faker } from '@faker-js/faker';
 
 export function makeFakeGroupMember(override: Partial<GroupMember> = {}): GroupMember {
@@ -10,8 +11,11 @@ export function makeFakeGroupMember(override: Partial<GroupMember> = {}): GroupM
     deleted_at: null,
     percentage_share: faker.number.float({ min: 0, max: 100, fractionDigits: 2 }),
     exact_share: null,
+    status: GroupMemberStatus.PENDING,
+    role: GroupMemberRole.MEMBER,
+    placeholder_assignee_name: null,
     group_id: faker.string.uuid(),
-    user_id: faker.string.uuid(),
+    user_id: null,
     ...override,
   };
 }

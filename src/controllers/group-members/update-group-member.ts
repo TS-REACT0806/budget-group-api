@@ -16,6 +16,8 @@ export const updateGroupMemberSchema = {
     .pick({
       percentage_share: true,
       exact_share: true,
+      placeholder_assignee_name: true,
+      user_id: true,
     })
     .partial(),
   response: groupMemberSchemaOpenApi,

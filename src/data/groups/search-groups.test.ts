@@ -1,21 +1,16 @@
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import { createTestGroupsInDB } from './__test-utils__/make-fake-group';
 import { searchGroupsData } from './search-groups';
-
-const fakeUser = makeFakeUser();
 
 describe('Search Groups', () => {
   testWithDbClient('should get a groups', async ({ dbClient }) => {
     const count = 10;
 
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({
       dbClient,
       values: Array.from({ length: count }).map((_, idx) => ({
         name: `Group ${idx}`,
-        owner_id: fakeUser.id,
       })),
     });
 
@@ -35,12 +30,10 @@ describe('Search Groups', () => {
   testWithDbClient('should return the correct pagination data', async ({ dbClient }) => {
     const count = 100;
 
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({
       dbClient,
       values: Array.from({ length: count }).map((_, idx) => ({
         name: `Group ${idx}`,
-        owner_id: fakeUser.id,
       })),
     });
 
@@ -56,13 +49,11 @@ describe('Search Groups', () => {
   });
 
   testWithDbClient('should search groups with specific search text', async ({ dbClient }) => {
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     const specificGroup = await createTestGroupsInDB({
       dbClient,
       values: {
         name: 'Group 1',
         description: 'Group 1 description',
-        owner_id: fakeUser.id,
       },
     });
 

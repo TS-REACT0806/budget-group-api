@@ -64,6 +64,7 @@ describe('registerAuthService', () => {
         first_name: payload.firstName,
         last_name: payload.lastName,
         role: payload.role ?? UserRoleType.USER,
+        mobile_no: null,
       },
     });
   });
@@ -122,6 +123,7 @@ describe('registerAuthService', () => {
         first_name: null,
         last_name: null,
         role: UserRoleType.USER,
+        mobile_no: null,
       },
     });
   });

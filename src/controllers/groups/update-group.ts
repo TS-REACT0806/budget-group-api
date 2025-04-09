@@ -17,6 +17,7 @@ export const updateGroupSchema = {
       name: true,
       description: true,
       split_type: true,
+      tag: true,
     })
     .partial(),
   response: groupSchemaOpenApi,

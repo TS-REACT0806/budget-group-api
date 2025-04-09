@@ -2,19 +2,12 @@ import { NotFoundError } from '@/utils/errors';
 import { faker } from '@faker-js/faker';
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import { createTestGroupsInDB } from './__test-utils__/make-fake-group';
 import { updateGroupData } from './update-group';
 
-const fakeUser = makeFakeUser();
-
 describe('Update Group', () => {
   testWithDbClient('should update a group', async ({ dbClient }) => {
-    await createTestUsersInDB({ dbClient, values: fakeUser });
-    const [testCreatedGroup] = await createTestGroupsInDB({
-      dbClient,
-      values: { owner_id: fakeUser.id },
-    });
+    const [testCreatedGroup] = await createTestGroupsInDB({ dbClient });
 
     if (!testCreatedGroup) throw new Error('testCreatedGroup is undefined');
 

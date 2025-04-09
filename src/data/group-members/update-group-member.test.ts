@@ -3,17 +3,14 @@ import { faker } from '@faker-js/faker';
 import { describe, expect } from 'vitest';
 import { testWithDbClient } from '../__test-utils__/test-with-db-client';
 import { createTestGroupsInDB, makeFakeGroup } from '../groups/__test-utils__/make-fake-group';
-import { createTestUsersInDB, makeFakeUser } from '../users/__test-utils__/make-fake-user';
 import {
   createTestGroupMembersInDB,
   makeFakeGroupMember,
 } from './__test-utils__/make-fake-group-member';
 import { updateGroupMemberData } from './update-group-member';
 
-const fakeUser = makeFakeUser();
-const fakeGroup = makeFakeGroup({ owner_id: fakeUser.id });
+const fakeGroup = makeFakeGroup();
 const fakeGroupMember = makeFakeGroupMember({
-  user_id: fakeUser.id,
   group_id: fakeGroup.id,
   percentage_share: 25,
   exact_share: null,
@@ -21,7 +18,6 @@ const fakeGroupMember = makeFakeGroupMember({
 
 describe('Update Group Member', () => {
   testWithDbClient('should update a group member', async ({ dbClient }) => {
-    await createTestUsersInDB({ dbClient, values: fakeUser });
     await createTestGroupsInDB({ dbClient, values: fakeGroup });
     await createTestGroupMembersInDB({ dbClient, values: fakeGroupMember });
 

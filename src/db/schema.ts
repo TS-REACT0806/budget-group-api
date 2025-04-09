@@ -1,12 +1,17 @@
+import { type SettlementSummary } from '@/data/groups/schema/settlement-summary';
 import {
   type accounts,
   type DB,
   type feature_flags,
   type group_expenses,
   type group_members,
+  type group_payment_transactions,
+  type GroupMemberRole,
+  type GroupMemberStatus,
+  type GroupPaymentTransactionStatus,
   type groups,
+  type GroupSplitType,
   type sessions,
-  type SplitType,
   type UserRoleType,
   type users,
 } from './types';
@@ -67,19 +72,31 @@ export type OverrideFeatureFlags = Omit<OverrideCommonFields<feature_flags>, 'js
 };
 
 export type OverrideGroup = Omit<OverrideCommonFields<groups>, 'split_type'> & {
-  split_type: SplitType;
+  split_type: GroupSplitType;
+  settlement_summary: SettlementSummary | null;
 };
 
 export type OverrideGroupExpense = Omit<OverrideCommonFields<group_expenses>, 'expense_date'> & {
   expense_date: Date | string | null;
 };
 
-export type Group = OverrideGroup;
-export type GroupMember = OverrideCommonFields<group_members>;
-export type GroupExpense = OverrideGroupExpense;
+export type OverrideGroupMember = Omit<OverrideCommonFields<group_members>, 'status' | 'role'> & {
+  status: GroupMemberStatus;
+  role: GroupMemberRole;
+};
+
+export type OverrideGroupPaymentTransaction = Omit<
+  OverrideCommonFields<group_payment_transactions>,
+  'status'
+> & { status: GroupPaymentTransactionStatus };
+
 export type User = OverrideUsers;
 export type Account = OverrideCommonFields<accounts>;
 export type Session = OverrideCommonFields<sessions>;
 export type FeatureFlag = OverrideFeatureFlags;
+export type Group = OverrideGroup;
+export type GroupMember = OverrideGroupMember;
+export type GroupExpense = OverrideGroupExpense;
+export type GroupPaymentTransaction = OverrideGroupPaymentTransaction;
 
 export type KyselySchema = DB;

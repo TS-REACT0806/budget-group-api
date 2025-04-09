@@ -1,6 +1,7 @@
 import { type Group } from '@/db/schema';
-import { SplitType } from '@/db/types';
+import { GroupSplitType } from '@/db/types';
 import { z } from '@hono/zod-openapi';
+import { settlementSummarySchema } from './settlement-summary';
 
 export const groupSchemaObject = {
   id: z.string().uuid(),
@@ -19,11 +20,14 @@ export const groupSchemaObject = {
   description: z.string().nullable().openapi({
     example: 'Group for our weekend trip expenses',
   }),
-  split_type: z.nativeEnum(SplitType).openapi({
-    example: SplitType.EQUAL,
+  tag: z.string().nullable().openapi({
+    example: 'trip',
   }),
-  owner_id: z.string().uuid().openapi({
-    example: '123e4567-e89b-12d3-a456-426614174000',
+  split_type: z.nativeEnum(GroupSplitType).openapi({
+    example: GroupSplitType.EQUAL,
+  }),
+  settlement_summary: settlementSummarySchema.nullable().openapi({
+    example: null,
   }),
 };
 
@@ -31,7 +35,5 @@ export const groupSchema = z.object(groupSchemaObject) satisfies z.ZodType<Group
 export const groupSchemaOpenApi = groupSchema.openapi('Group');
 export const groupSchemaFields = z.enum(Object.keys(groupSchemaObject) as [string, ...string[]]);
 
-export type CreateGroup = Omit<Group, 'id' | 'created_at' | 'updated_at' | 'deleted_at'> & {
-  id?: string;
-};
+export type CreateGroup = Omit<Group, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>;
 export type UpdateGroup = Partial<Group>;

@@ -27,9 +27,7 @@ model users {
   role       UserRoleType @default(USER)
 
   // Relations
-  groups         groups[]
-  group_members  group_members[]
-  group_expenses group_expenses[]
+  group_members group_members[]
 
   // Indexes
   @@index([created_at])
@@ -96,58 +94,78 @@ model feature_flags {
   @@index([role])
 }
 
-enum SplitType {
+enum GroupSplitType {
   EQUAL
   PERCENTAGE
   EXACT
 }
 
 model groups {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
-  deleted_at  DateTime? @db.Timestamptz(6)
-  name        String
-  description String?
-  split_type  SplitType @default(EQUAL)
-
-  // Foreign Keys
-  owner_id String @db.Uuid
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime       @default(now()) @db.Timestamptz(6)
+  deleted_at         DateTime?      @db.Timestamptz(6)
+  name               String
+  description        String?
+  tag                String?
+  split_type         GroupSplitType @default(EQUAL)
+  settlement_summary Json?
 
   // Relations
-  owner          users            @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  group_members  group_members[]
-  group_expenses group_expenses[]
+  group_members              group_members[]
+  group_expenses             group_expenses[]
+  group_payment_transactions group_payment_transactions[]
 
   // Indexes
   @@index([created_at])
   @@index([updated_at])
   @@index([deleted_at])
-  @@index([owner_id])
+}
+
+enum GroupMemberStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GroupMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
 }
 
 model group_members {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at       DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
-  deleted_at       DateTime? @db.Timestamptz(6)
-  percentage_share Float?
-  exact_share      Decimal?  @db.Decimal(10, 2)
+  id                        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at                DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime          @default(now()) @db.Timestamptz(6)
+  deleted_at                DateTime?         @db.Timestamptz(6)
+  percentage_share          Float?
+  exact_share               Decimal?          @db.Decimal(10, 2)
+  status                    GroupMemberStatus @default(PENDING)
+  role                      GroupMemberRole   @default(MEMBER)
+  placeholder_assignee_name String?
 
   // Foreign Keys
-  group_id String @db.Uuid
-  user_id  String @db.Uuid
+  user_id  String? @db.Uuid
+  group_id String  @db.Uuid
 
   // Relations
-  group groups @relation(fields: [group_id], references: [id], onDelete: Cascade)
-  user  users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user             users?                       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  group            groups                       @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  group_expenses   group_expenses[]
+  sender_members   group_payment_transactions[] @relation("sender_member")
+  receiver_members group_payment_transactions[] @relation("receiver_member")
 
+  // Unique constraints
+  @@unique([group_id, user_id])
   // Indexes
   @@index([created_at])
   @@index([updated_at])
   @@index([deleted_at])
   @@index([group_id])
   @@index([user_id])
+  @@index([status])
+  @@index([role])
 }
 
 model group_expenses {
@@ -158,20 +176,55 @@ model group_expenses {
   amount       Decimal   @db.Decimal(10, 2)
   expense_date DateTime? @db.Timestamptz(6)
   description  String?
+  tag          String?
 
   // Foreign Keys
-  group_id String @db.Uuid
-  owner_id String @db.Uuid
+  group_id  String @db.Uuid
+  member_id String @db.Uuid
 
   // Relations
-  group groups @relation(fields: [group_id], references: [id], onDelete: Cascade)
-  owner users  @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  group  groups        @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  member group_members @relation(fields: [member_id], references: [id], onDelete: Cascade)
 
   // Indexes
   @@index([created_at])
   @@index([updated_at])
   @@index([deleted_at])
-  @@index([owner_id])
   @@index([group_id])
+  @@index([member_id])
   @@index([expense_date])
+  @@index([tag])
+}
+
+enum GroupPaymentTransactionStatus {
+  REQUESTED
+  PAID
+  REJECTED
+  VOIDED
+}
+
+model group_payment_transactions {
+  id          String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime                      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime                      @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime?                     @db.Timestamptz(6)
+  amount      Decimal                       @db.Decimal(10, 2)
+  description String?
+  status      GroupPaymentTransactionStatus @default(REQUESTED)
+
+  // Foreign Keys
+  group_id           String @db.Uuid
+  sender_member_id   String @db.Uuid
+  receiver_member_id String @db.Uuid
+
+  // Relations
+  group           groups        @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  sender_member   group_members @relation("sender_member", fields: [sender_member_id], references: [id], onDelete: Cascade)
+  receiver_member group_members @relation("receiver_member", fields: [receiver_member_id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([created_at])
+  @@index([group_id])
+  @@index([sender_member_id])
+  @@index([receiver_member_id])
 }

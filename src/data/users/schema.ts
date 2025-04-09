@@ -22,6 +22,9 @@ export const userSchemaObject = {
   last_name: z.string().nullable().openapi({
     example: 'ROD',
   }),
+  mobile_no: z.string().nullable().openapi({
+    example: '+639171234567',
+  }),
   role: z.nativeEnum(UserRoleType).openapi({
     example: UserRoleType.USER,
   }),

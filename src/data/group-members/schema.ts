@@ -1,4 +1,6 @@
 import { type GroupMember } from '@/db/schema';
+import { GroupMemberRole, GroupMemberStatus } from '@/db/types';
+import { decimalNumberSchema } from '@/utils/zod-schemas';
 import { z } from '@hono/zod-openapi';
 
 export const groupMemberSchemaObject = {
@@ -15,14 +17,23 @@ export const groupMemberSchemaObject = {
   percentage_share: z.number().nullable().openapi({
     example: 25.5,
   }),
-  exact_share: z.union([z.string(), z.null()]).nullable().openapi({
+  exact_share: decimalNumberSchema.nullable().openapi({
     example: '50.75',
   }),
-  group_id: z.string().uuid().openapi({
-    example: '123e4567-e89b-12d3-a456-426614174001',
+  status: z.nativeEnum(GroupMemberStatus).openapi({
+    example: GroupMemberStatus.PENDING,
+  }),
+  role: z.nativeEnum(GroupMemberRole).openapi({
+    example: GroupMemberRole.MEMBER,
+  }),
+  placeholder_assignee_name: z.string().nullable().openapi({
+    example: 'John Doe',
   }),
   user_id: z.string().uuid().openapi({
     example: '123e4567-e89b-12d3-a456-426614174002',
+  }),
+  group_id: z.string().uuid().openapi({
+    example: '123e4567-e89b-12d3-a456-426614174003',
   }),
 };
 
@@ -35,7 +46,5 @@ export const groupMemberSchemaFields = z.enum(
 export type CreateGroupMember = Omit<
   GroupMember,
   'id' | 'created_at' | 'updated_at' | 'deleted_at'
-> & {
-  id?: string;
-};
+>;
 export type UpdateGroupMember = Partial<GroupMember>;
