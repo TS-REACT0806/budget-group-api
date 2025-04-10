@@ -34,7 +34,7 @@ export async function deleteGroupService({
   });
 
   if (groupMemberData.role !== GroupMemberRole.OWNER) {
-    throw new ForbiddenError('You are not authorized to update this group.');
+    throw new ForbiddenError('You are not authorized to delete this group.');
   }
 
   const deletedGroup = await dependencies.deleteGroupData({

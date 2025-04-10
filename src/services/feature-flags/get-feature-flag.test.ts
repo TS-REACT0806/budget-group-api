@@ -1,3 +1,4 @@
+import { makeFakeUser } from '@/data/users/__test-utils__/make-fake-user';
 import { mockDbClient } from '@/db/__test-utils__/mock-db-client';
 import { UserRoleType } from '@/db/types';
 import { mockSession } from '@/middlewares/__test-utils__/openapi-hono';
@@ -10,13 +11,13 @@ const mockDependencies = {
   getFeatureFlagData: vi.fn(),
 };
 
-const mockUserData = {
+const mockUserData = makeFakeUser({
   id: '123',
   email: 'test@example.com',
   role: UserRoleType.USER,
   first_name: 'Test',
   last_name: 'User',
-};
+});
 
 const mockFeatureFlagData = {
   id: '456',

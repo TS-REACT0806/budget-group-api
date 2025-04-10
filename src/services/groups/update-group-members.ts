@@ -45,11 +45,11 @@ export async function updateGroupMembersService({
       groupMemberData.role !== GroupMemberRole.OWNER &&
       groupMemberData.role !== GroupMemberRole.ADMIN
     ) {
-      throw new ForbiddenError('You are not authorized to update members of this group.');
+      throw new ForbiddenError('You are not authorized to update members in this group.');
     }
 
     if (payload.members.length === 0) {
-      throw new BadRequestError('You must update at least one member of a group.');
+      throw new BadRequestError('You must update at least one member in a group.');
     }
 
     const updateMemberPromises = payload.members.map(member => {

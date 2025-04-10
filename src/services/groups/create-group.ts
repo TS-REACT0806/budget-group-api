@@ -17,8 +17,8 @@ export type CreateGroupServiceArgs = {
   payload: {
     session: Session;
     name: string;
-    description?: string;
-    tag?: string;
+    description?: string | null;
+    tag?: string | null;
     split_type?: GroupSplitType;
     members?: Array<{
       placeholder_assignee_name: string | null;
