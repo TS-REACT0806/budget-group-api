@@ -12,8 +12,8 @@ export function makeFakeUser(overrides?: Partial<User>) {
     first_name: faker.person.firstName(),
     last_name: faker.person.lastName(),
     email: faker.internet.email().toLowerCase(),
-    mobile_no: null,
     role: UserRoleType.USER,
+    mobile_no: null,
     ...overrides,
   } satisfies User;
 }

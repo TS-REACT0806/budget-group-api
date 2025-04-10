@@ -5,6 +5,16 @@ import { testWithDbClient } from '../__test-utils__/test-with-db-client';
 import { createTestUsersInDB, makeFakeUser } from './__test-utils__/make-fake-user';
 import { searchUsersData } from './search-users';
 
+const setupTestData = async ({
+  dbClient,
+  users,
+}: {
+  dbClient: DbClient;
+  users: Partial<User>[];
+}) => {
+  await createTestUsersInDB({ dbClient, values: users });
+};
+
 const mockUser1 = makeFakeUser({ first_name: 'John', last_name: 'Doe', email: 'john@example.com' });
 const mockUser2 = makeFakeUser({
   first_name: 'Jane',
@@ -17,30 +27,9 @@ const mockUser3 = makeFakeUser({
   email: 'bob@example.com',
 });
 
-const setupTestData = async ({
-  dbClient,
-  user1Overrides,
-  user2Overrides,
-  user3Overrides,
-}: {
-  dbClient: DbClient;
-  user1Overrides?: Partial<User>;
-  user2Overrides?: Partial<User>;
-  user3Overrides?: Partial<User>;
-}) => {
-  await createTestUsersInDB({
-    dbClient,
-    values: [
-      { ...mockUser1, ...user1Overrides },
-      { ...mockUser2, ...user2Overrides },
-      { ...mockUser3, ...user3Overrides },
-    ],
-  });
-};
-
 describe('Search Users', () => {
   testWithDbClient('should search users with pagination', async ({ dbClient }) => {
-    await setupTestData({ dbClient });
+    await setupTestData({ dbClient, users: [mockUser1, mockUser2, mockUser3] });
 
     const result = await searchUsersData({
       dbClient,
@@ -61,15 +50,11 @@ describe('Search Users', () => {
   });
 
   testWithDbClient('should return the correct pagination data', async ({ dbClient }) => {
-    // Create 30 users for pagination testing
-    const users = Array.from({ length: 30 }).map((_, idx) =>
+    const mockUsers = Array.from({ length: 30 }).map((_, idx) =>
       makeFakeUser({ first_name: `User${idx}`, last_name: `Test${idx}` })
     );
 
-    await createTestUsersInDB({
-      dbClient,
-      values: users,
-    });
+    await setupTestData({ dbClient, users: mockUsers });
 
     const result = await searchUsersData({
       dbClient,
@@ -86,7 +71,7 @@ describe('Search Users', () => {
   });
 
   testWithDbClient('should search users with specific search text', async ({ dbClient }) => {
-    await setupTestData({ dbClient });
+    await setupTestData({ dbClient, users: [mockUser1, mockUser2, mockUser3] });
 
     const result = await searchUsersData({
       dbClient,
