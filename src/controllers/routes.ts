@@ -1,7 +1,5 @@
 import authRoutes from './auth/routes';
 import featureFlagsRoutes from './feature-flags/routes';
-import groupExpensesRoutes from './group-expenses/routes';
-import groupMembersRoutes from './group-members/routes';
 import groupsRoutes from './groups/routes';
 import meRoutes from './me/routes';
 import serverRoutes from './server/routes';
@@ -14,8 +12,6 @@ export const routes = [
   meRoutes,
   usersRoutes,
   groupsRoutes,
-  groupMembersRoutes,
-  groupExpensesRoutes,
 ] as const;
 
 export type AppRoutes = (typeof routes)[number];

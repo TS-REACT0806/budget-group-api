@@ -23,8 +23,17 @@ export async function createTestGroupExpensesInDB({
   values,
 }: {
   dbClient: DbClient;
-  values: GroupExpense | GroupExpense[];
+  values: Partial<GroupExpense> | Partial<GroupExpense>[];
 }) {
-  const valuesArray = Array.isArray(values) ? values : [values];
-  await dbClient.insertInto('group_expenses').values(valuesArray).execute();
+  const fakeGroupExpenses = Array.isArray(values)
+    ? values.map(makeFakeGroupExpense)
+    : makeFakeGroupExpense(values);
+
+  const createdGroupExpenses = await dbClient
+    .insertInto('group_expenses')
+    .values(fakeGroupExpenses)
+    .returningAll()
+    .execute();
+
+  return createdGroupExpenses;
 }

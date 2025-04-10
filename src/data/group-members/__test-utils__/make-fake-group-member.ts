@@ -25,8 +25,17 @@ export async function createTestGroupMembersInDB({
   values,
 }: {
   dbClient: DbClient;
-  values: GroupMember | GroupMember[];
+  values: Partial<GroupMember> | Partial<GroupMember>[];
 }) {
-  const valuesArray = Array.isArray(values) ? values : [values];
-  await dbClient.insertInto('group_members').values(valuesArray).execute();
+  const fakeGroupMembers = Array.isArray(values)
+    ? values.map(makeFakeGroupMember)
+    : makeFakeGroupMember(values);
+
+  const createdGroupMembers = await dbClient
+    .insertInto('group_members')
+    .values(fakeGroupMembers)
+    .returningAll()
+    .execute();
+
+  return createdGroupMembers;
 }
