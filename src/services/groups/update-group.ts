@@ -53,7 +53,7 @@ export async function updateGroupService({
       throw new ForbiddenError('You are not authorized to update members of this group.');
     }
 
-    if (payload.members.length === 0) {
+    if (payload.members && !payload.members.length === 0) {
       throw new BadRequestError('You must update at least one member of a group.');
     }
 
